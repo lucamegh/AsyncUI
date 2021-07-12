@@ -1,11 +1,10 @@
-    import XCTest
-    @testable import AsyncUI
+/**
+ * AsyncUI
+ * Copyright (c) Luca Meghnagi 2021
+ * MIT license, see LICENSE file for details
+ */
 
-    final class AsyncUITests: XCTestCase {
-        func testExample() {
-            // This is an example of a functional test case.
-            // Use XCTAssert and related functions to verify your tests produce the correct
-            // results.
-            XCTAssertEqual(AsyncUI().text, "Hello, World!")
-        }
-    }
+import XCTest
+@testable import AsyncUI
+
+final class AsyncUITests: XCTestCase {}

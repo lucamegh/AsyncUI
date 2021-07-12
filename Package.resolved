@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CombineHelpers",
+        "repositoryURL": "https://github.com/lucamegh/CombineHelpers",
+        "state": {
+          "branch": null,
+          "revision": "9b5a8afcb86246a4d812a35920f9451dea5d6692",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "Install",
+        "repositoryURL": "https://github.com/lucamegh/Install",
+        "state": {
+          "branch": null,
+          "revision": "a0739adea2b2a11878b9e9838f73b8b3c94bcad4",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "LoadingState",
+        "repositoryURL": "https://github.com/lucamegh/LoadingState",
+        "state": {
+          "branch": null,
+          "revision": "08975adfd6885b7559f3754a1686325ad0201e4e",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "Portal",
+        "repositoryURL": "https://github.com/lucamegh/Portal",
+        "state": {
+          "branch": null,
+          "revision": "bb0a99fe4fa9cdbc90e0e069f7948398c08b963d",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
