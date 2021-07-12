@@ -130,6 +130,51 @@ public extension AsyncContentViewController {
     }
 }
 
+public extension AsyncContentViewController where Error == Never {
+    
+    convenience init(
+        content: @escaping () -> AnyPublisher<Content, Error>,
+        render: @escaping (Content) -> UIViewController,
+        loadingMessage: String? = nil
+    ) {
+        self.init(content: content) { context in
+            ViewControllerProvider { state in
+                switch state {
+                case .idle:
+                    return nil
+                case .inProgress:
+                    return LoadingViewController(message: loadingMessage)
+                case .success(let content):
+                    return render(content)
+                case .failure:
+                    return nil
+                }
+            }
+        }
+    }
+    
+    static func custom(
+        content: @escaping () -> AnyPublisher<Content, Error>,
+        renderLoading: @escaping () -> UIViewController,
+        renderContent: @escaping (Content) -> UIViewController
+    ) -> AsyncContentViewController {
+        custom(content: content) { _ in
+            ViewControllerProvider { state in
+                switch state {
+                case .idle:
+                    return nil
+                case .inProgress:
+                    return renderLoading()
+                case .success(let content):
+                    return renderContent(content)
+                case .failure:
+                    return nil
+                }
+            }
+        }
+    }
+}
+
 public extension AsyncContentViewController {
     
     struct ViewControllerProvider {
