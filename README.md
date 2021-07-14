@@ -18,7 +18,7 @@ let package = Package(
 
 ## Usage
 
-```
+```swift
 let asyncProfileVC = AsyncContentViewController(
     content: {
         ProfileLoader.shared.profile(id: 1234) // AnyPublisher<Profile, ProfileLoader.Error>
@@ -36,7 +36,7 @@ Pretty cool, huh?
 
 You can also provide different error messages and retry policies depending on the error:
 
-```
+```swift
 AsyncContentViewController(
     ...,
     errorMessage: { error in
