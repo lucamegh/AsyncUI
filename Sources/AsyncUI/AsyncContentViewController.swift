@@ -16,7 +16,7 @@ public final class AsyncContentViewController<Content, Error: Swift.Error>: UIVi
     public var transitionProvider: TransitionProvider? = .fixed(.default)
     
     private lazy var containerViewController = ContainerViewController(
-        content: viewControllerProvider(context).viewController(for: state)
+        content: viewControllerProvider.viewController(for: state, context: context)
     )
     
     private var context: Context {
@@ -32,11 +32,11 @@ public final class AsyncContentViewController<Content, Error: Swift.Error>: UIVi
     
     private let content: () -> AnyPublisher<Content, Error>
     
-    private let viewControllerProvider: (Context) -> ViewControllerProvider
+    private let viewControllerProvider: ViewControllerProvider
     
     fileprivate init(
         content: @escaping () -> AnyPublisher<Content, Error>,
-        viewControllerProvider: @escaping (Context) -> ViewControllerProvider
+        viewControllerProvider: ViewControllerProvider
     ) {
         self.content = content
         self.viewControllerProvider = viewControllerProvider
@@ -65,7 +65,7 @@ public final class AsyncContentViewController<Content, Error: Swift.Error>: UIVi
         contentCancellable = $state.sink { [unowned self] state in
             let transition = transitionProvider?.transition(for: state)
             containerViewController.setContent(
-                viewControllerProvider(context).viewController(for: state),
+                viewControllerProvider.viewController(for: state, context: context),
                 using: transition
             )
         }
@@ -76,31 +76,47 @@ public extension AsyncContentViewController {
     
     convenience init(
         content: @escaping () -> AnyPublisher<Content, Error>,
+        loadingMessage: String? = nil,
+        errorMessage: String,
+        retryPolicy: RetryPolicy = .always,
+        render: @escaping (Content) -> UIViewController
+    ) {
+        self.init(
+            content: content,
+            render: render,
+            loadingMessage: loadingMessage,
+            errorMessage: { _ in errorMessage }
+        )
+    }
+    
+    convenience init(
+        content: @escaping () -> AnyPublisher<Content, Error>,
         render: @escaping (Content) -> UIViewController,
         loadingMessage: String? = nil,
         errorMessage: @escaping (Error) -> String,
-        retryBehavior: RetryBehavior = .always
+        retryPolicy: RetryPolicy = .always
     ) {
-        self.init(content: content) { context in
-            ViewControllerProvider(
+        self.init(
+            content: content,
+            viewControllerProvider: ViewControllerProvider(
                 renderLoading: {
                     LoadingViewController(message: loadingMessage)
                 },
                 renderContent: render,
-                renderError: { error in
+                renderError: { error, retry in
                     let message = errorMessage(error)
-                    let retry = retryBehavior.shouldRetry(error) ? context.retry : nil
+                    let retry = retryPolicy.shouldRetry(error) ? retry : nil
                     return ErrorViewController(message: message, retry: retry)
                 }
             )
-        }
+        )
     }
     
     static func custom(
         content: @escaping () -> AnyPublisher<Content, Error>,
         renderLoading: @escaping () -> UIViewController,
         renderContent: @escaping (Content) -> UIViewController,
-        renderError: @escaping (Error) -> UIViewController
+        renderError: @escaping (Error, RetryAction) -> UIViewController
     ) -> AsyncContentViewController {
         custom(
             content: content,
@@ -114,14 +130,17 @@ public extension AsyncContentViewController {
     
     static func custom(
         content: @escaping () -> AnyPublisher<Content, Error>,
-        viewControllerProvider: ViewControllerProvider
+        render: @escaping (State, Context) -> UIViewController?
     ) -> AsyncContentViewController {
-        custom(content: content) { _ in viewControllerProvider }
+        AsyncContentViewController(
+            content: content,
+            viewControllerProvider: ViewControllerProvider(render)
+        )
     }
     
     static func custom(
         content: @escaping () -> AnyPublisher<Content, Error>,
-        viewControllerProvider: @escaping (Context) -> ViewControllerProvider
+        viewControllerProvider: ViewControllerProvider
     ) -> AsyncContentViewController {
         AsyncContentViewController(
             content: content,
@@ -137,8 +156,9 @@ public extension AsyncContentViewController where Error == Never {
         render: @escaping (Content) -> UIViewController,
         loadingMessage: String? = nil
     ) {
-        self.init(content: content) { context in
-            ViewControllerProvider { state in
+        self.init(
+            content: content,
+            viewControllerProvider: ViewControllerProvider { state, context in
                 switch state {
                 case .idle:
                     return nil
@@ -150,7 +170,7 @@ public extension AsyncContentViewController where Error == Never {
                     return nil
                 }
             }
-        }
+        )
     }
     
     static func custom(
@@ -158,8 +178,9 @@ public extension AsyncContentViewController where Error == Never {
         renderLoading: @escaping () -> UIViewController,
         renderContent: @escaping (Content) -> UIViewController
     ) -> AsyncContentViewController {
-        custom(content: content) { _ in
-            ViewControllerProvider { state in
+        custom(
+            content: content,
+            viewControllerProvider: ViewControllerProvider { state, _ in
                 switch state {
                 case .idle:
                     return nil
@@ -171,7 +192,7 @@ public extension AsyncContentViewController where Error == Never {
                     return nil
                 }
             }
-        }
+        )
     }
 }
 
@@ -179,18 +200,18 @@ public extension AsyncContentViewController {
     
     struct ViewControllerProvider {
         
-        private let render: (State) -> UIViewController?
+        private let render: (State, Context) -> UIViewController?
         
-        public init(_ render: @escaping (State) -> UIViewController?) {
+        public init(_ render: @escaping (State, Context) -> UIViewController?) {
             self.render = render
         }
         
         public init(
             renderLoading: @escaping () -> UIViewController,
             renderContent: @escaping (Content) -> UIViewController,
-            renderError: @escaping (Error) -> UIViewController
+            renderError: @escaping (Error, RetryAction) -> UIViewController
         ) {
-            self.init { state in
+            self.init { state, context in
                 switch state {
                 case .idle:
                     return nil
@@ -199,13 +220,13 @@ public extension AsyncContentViewController {
                 case .success(let content):
                     return renderContent(content)
                 case .failure(let error):
-                    return renderError(error)
+                    return renderError(error, context.retry)
                 }
             }
         }
         
-        fileprivate func viewController(for state: State) -> UIViewController? {
-            render(state)
+        fileprivate func viewController(for state: State, context: Context) -> UIViewController? {
+            render(state, context)
         }
     }
 }
@@ -243,7 +264,7 @@ public extension AsyncContentViewController {
 
 public extension AsyncContentViewController {
     
-    struct RetryBehavior {
+    struct RetryPolicy {
         
         fileprivate let shouldRetry: (Error) -> Bool
         
@@ -252,15 +273,15 @@ public extension AsyncContentViewController {
         }
         
         public static var always: Self {
-            custom { _ in true }
+            RetryPolicy { _ in true }
         }
         
         public static var never: Self {
-            custom { _ in false }
+            RetryPolicy { _ in false }
         }
         
         public static func custom(_ shouldRetry: @escaping (Error) -> Bool) -> Self {
-            RetryBehavior(shouldRetry)
+            RetryPolicy(shouldRetry)
         }
     }
 }
