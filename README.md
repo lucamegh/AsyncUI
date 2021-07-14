@@ -83,4 +83,4 @@ AsyncContentViewController.custom(
 )
 ```
 
-The error rendering function takes a `RetryAction` instance that incapsulates `AsyncContentViewController`'s retrying logic. Call it from your cutom error view controller to give users a chance to reload the asynchronous content.
+The error rendering function takes a `RetryAction` instance that incapsulates `AsyncContentViewController`'s retrying logic. Call it from your custom error view controller to give users a chance to reload the asynchronous content.
