@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "Install",
-        "repositoryURL": "https://github.com/lucamegh/Install",
-        "state": {
-          "branch": null,
-          "revision": "a0739adea2b2a11878b9e9838f73b8b3c94bcad4",
-          "version": "1.0.0"
-        }
-      },
-      {
         "package": "LoadingState",
         "repositoryURL": "https://github.com/lucamegh/LoadingState",
         "state": {
@@ -33,7 +24,16 @@
         "repositoryURL": "https://github.com/lucamegh/Portal",
         "state": {
           "branch": null,
-          "revision": "bb0a99fe4fa9cdbc90e0e069f7948398c08b963d",
+          "revision": "72d04f3bf98cb5cbb552e158f4397df08afb6de1",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "UIKitHelpers",
+        "repositoryURL": "https://github.com/lucamegh/UIKitHelpers",
+        "state": {
+          "branch": null,
+          "revision": "491948bd83c22939b854b4e99efa9efbbcca5640",
           "version": "1.0.0"
         }
       }
