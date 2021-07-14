@@ -60,7 +60,7 @@ AsyncContentViewController(
 
 When `retryPolicy` returns a `RetryPolicy.always`, the standard failure view controller will display a retry button.
 
-If you don't want to use the standard loading and failure view controllers, use one of the `AsyncContentViewController.custom` factory methods to provide your own.
+If you don't want to use the standard loading and failure view controllers, use one of the `AsyncContentViewController.custom` static factory methods to provide your own.
 
 Let's see how to implement an asynchronously loaded list with custom loading and failure screens using [Lists](https://github.com/lucamegh/Lists) and AsyncUI.
 
@@ -72,7 +72,7 @@ AsyncContentViewController.custom(
         if recipes.isEmpty {
             return EmptyViewController(configuration: .recipes)
         } else {
-            ListViewController(cellType: RecipeCell.self, items: recipes) { cell, recipe in
+            return ListViewController(cellType: RecipeCell.self, items: recipes) { cell, recipe in
                 cell.configure(with: recipe)
             }
         }
