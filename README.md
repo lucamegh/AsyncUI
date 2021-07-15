@@ -76,7 +76,7 @@ AsyncContentViewController.custom(
             return EmptyViewController(configuration: .recipes)
         } else {
             return ListViewController(cellType: RecipeCell.self, items: recipes) { cell, recipe in
-                cell.configure(with: recipe)
+                cell.viewModel = RecipeViewModel(recipe: recipe)
             }
         }
     },
