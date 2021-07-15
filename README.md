@@ -34,11 +34,12 @@ navigationController.pushViewController(asyncProfileVC, animated: true)
 
 Pretty cool, huh? 
 
-You can also provide different error messages and retry policies depending on the error:
+You can also provide a loading message and different error messages and retry policies depending on the error:
 
 ```swift
 AsyncContentViewController(
     ...,
+    loadingMessage: "This won't take long",
     errorMessage: { error in
         switch error {
         case .notConnectedToInternet:
@@ -66,7 +67,9 @@ Let's see how to implement an asynchronously loaded list with custom loading and
 
 ```swift
 AsyncContentViewController.custom(
-    content: Cookbook.shared.favoriteRecipes,
+    content: { 
+        Cookbook.shared.favoriteRecipes()
+    },
     renderLoading: MyLoadingViewController.init,
     renderContent: { recipes in
         if recipes.isEmpty {
@@ -78,9 +81,10 @@ AsyncContentViewController.custom(
         }
     },
     renderError: { error, retry in
-        MyErrorViewController(message: error.recoverySuggestion, retry: retry)
+        let message = error.recoverySuggestion
+        return MyErrorViewController(message: message, retry: retry)
     }
 )
 ```
 
-The error rendering function takes a `RetryAction` instance that incapsulates `AsyncContentViewController`'s retrying logic. Call it from your custom error view controller to give users a chance to reload the asynchronous content.
+The error rendering closure takes a `RetryAction` instance that incapsulates `AsyncContentViewController`'s retrying logic. Call it from your custom error view controller to give users a chance to reload the asynchronous content.
