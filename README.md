@@ -34,7 +34,7 @@ navigationController.pushViewController(asyncProfileVC, animated: true)
 
 Pretty cool, huh? 
 
-You can also provide a loading message and different error messages and retry policies depending on the error:
+You can also map different error messages and retry policies to each error:
 
 ```swift
 AsyncContentViewController(
