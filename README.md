@@ -1,6 +1,6 @@
 # AsyncUI ⌛️
 
-AsyncUI solves the problem of loading and displaying asynchronous content in modern UIKit apps.
+AsyncUI solves the common problem of loading and displaying asynchronous content in modern UIKit apps.
 
 ## Installation
 
