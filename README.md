@@ -19,6 +19,8 @@ let package = Package(
 ## Usage
 
 ```swift
+import AsyncUI
+
 let asyncProfileVC = AsyncContentViewController(
     content: {
         ProfileLoader.shared.profile(id: 1234) // AnyPublisher<Profile, ProfileLoader.Error>
