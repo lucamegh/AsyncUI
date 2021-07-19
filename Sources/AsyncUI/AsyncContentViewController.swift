@@ -13,6 +13,10 @@ import UIKitHelpers
 
 public final class AsyncContentViewController<Content, Error: Swift.Error>: UIViewController {
     
+    public override var childForStatusBarStyle: UIViewController? {
+        containerViewController
+    }
+    
     public var transitionProvider: TransitionProvider? = .fixed(.default)
     
     private lazy var containerViewController = ContainerViewController(
