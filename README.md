@@ -2,6 +2,10 @@
 
 AsyncUI solves the common problem of loading and displaying asynchronous content in modern UIKit apps.
 
+<p>
+  	<img src="https://user-images.githubusercontent.com/7815995/126147742-21bdbc6a-3783-4cb7-b351-8a4c31655b0d.gif" alt="AsyncUI" title="AsyncUI"> 
+</p>
+
 ## Installation
 
 AsyncUI is distributed using [Swift Package Manager](https://swift.org/package-manager). To install it into a project, simply add it as a dependency within your Package.swift manifest:
